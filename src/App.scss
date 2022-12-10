@@ -1,0 +1,51 @@
+.App {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.AddEmployee {
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    label {
+      display: block;
+      margin-bottom: 4px;
+    }
+    input {
+      padding: 12px;
+      min-width: 400px;
+    }
+    button {
+      padding: 12px 36px;
+      cursor: pointer;
+      display: block;
+    }
+    button + button {
+      margin-top: 18px;
+    }
+    p {
+      color: #ff0000;
+      margin: 0 0 24px 0;
+    }
+  }
+  margin-bottom: 36px;
+}
+
+.ViewEditEmployees {
+  width: 100%;
+  td,
+  th {
+    border: 1px solid #ccc;
+    text-align: left;
+    padding: 8px;
+  }
+  tr:nth-child(even) {
+    background-color: #ccc;
+  }
+  table {
+    width: 100%;
+  }
+  padding-bottom: 200px;
+}

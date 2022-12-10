@@ -3,8 +3,12 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { useState, useMemo, useEffect } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
+import Axios from "axios";
 
 function App() {
+  const [employees, setEmployees] = useState([]);
+  const [toggleView, setToggleView] = useState(false);
+  const [successNoti, setSuccessNoti] = useState(false);
 
   const schema = useMemo(() => {
     return yup.object().shape({
@@ -27,8 +31,38 @@ function App() {
     mode: "onChange"
   });
 
+  useEffect(() => {
+    Axios.get("http://localhost:3001/employees")
+      .then((res) => {
+        setEmployees(res?.data);
+      })
+      .catch((err) => {
+        console.log("Error: ", err)
+      })
+  }, [])
+
+  useEffect(() => {
+    if (successNoti) {
+      setSuccessNoti(false);
+    }
+  }, [watch("name"), watch("age"), watch("country"), watch("position"), watch("wage")])
+
   const onSubmit = (data) => {
-    console.log("data: ", data)
+    Axios.post("http://localhost:3001/employees", {
+      name: data?.name,
+      age: data?.age,
+      position: data?.position,
+      country: data?.country,
+      wage: data?.wage
+    })
+      .then((res) => {
+        setEmployees([...employees, res.data]);
+        setSuccessNoti(true);
+        reset();
+      })
+      .catch((err) => {
+        console.log("Error: ", err)
+      })
   }
 
   return (
@@ -57,30 +91,42 @@ function App() {
           <p>{errors?.wage && errors?.wage?.message}</p>
 
           <button type='submit'>Add Employee</button>
+          {successNoti && <p className="AddEmployeeSuccessMessage">Successfully add employee !</p>}
 
-          <button type='button'>View Employee</button>
+          <button type='button' onClick={() => setToggleView(!toggleView)}>View Employee</button>
         </form>
       </div>
 
-      <div className="ViewEditEmployees">
-        <h1>All Employees: </h1>
-        <table>
-          <tr>
-            <th>Name</th>
-            <th>Age</th>
-            <th>Country</th>
-            <th>Position</th>
-            <th>Wage</th>
-          </tr>
-          <tr>
-            <td>Name</td>
-            <td>Age</td>
-            <td>Country</td>
-            <td>Position</td>
-            <td>Wage</td>
-          </tr>
-        </table>
-      </div>
+      {
+        toggleView && (
+          <div className="ViewEditEmployees">
+            <h1>All Employees: </h1>
+            <table>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Country</th>
+                <th>Position</th>
+                <th>Wage</th>
+              </tr>
+              {
+                employees?.length && employees?.map((item) => (
+                  <tr>
+                    <td>{item?.id}</td>
+                    <td>{item?.name}</td>
+                    <td>{item?.age}</td>
+                    <td>{item?.country}</td>
+                    <td>{item?.position}</td>
+                    <td>{item?.wage}</td>
+                  </tr>
+                ))
+              }
+            </table>
+          </div>
+        )
+      }
+
     </div>
   );
 }
